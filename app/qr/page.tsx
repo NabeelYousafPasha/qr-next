@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import axios from "axios";
-import { API_BASE } from "../../constants/api";
+import { API_BASE } from "@/constants/api";
 
 export default function QRCodePage() {
     const [inputValue, setInputValue] = useState("");
@@ -15,7 +15,13 @@ export default function QRCodePage() {
     const fetchVisitor = async (code: string) => {
         try {
             const res = await axios.get(
-                `${API_BASE}/Visitors/ValidateQRCode/${encodeURIComponent(code)}`
+                `${API_BASE}/Visitors/ValidateQRCode/${encodeURIComponent(code)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_BEARER_TOKEN}`,
+                        Accept: "application/json",
+                    },
+                }
             );
             setVisitor(res.data);
         } catch (err: any) {
@@ -105,8 +111,8 @@ export default function QRCodePage() {
                         <p><strong>Company:</strong> {visitor.company}</p>
                         <p><strong>Email:</strong> {visitor.email}</p>
                         <p><strong>Phone:</strong> {visitor.phone}</p>
-                        <p><strong>Nationality:</strong> {visitor.nationality.toUpperCase()}</p>
-                        <p><strong>Country of Residence:</strong> {visitor.countryOfResidence.toUpperCase()}</p>
+                        <p><strong>Nationality:</strong> {visitor.nationality?.toUpperCase()}</p>
+                        <p><strong>Country of Residence:</strong> {visitor.countryOfResidence?.toUpperCase()}</p>
                         <p><strong>ID Type:</strong> {visitor.idType}</p>
                         <p><strong>ID Number:</strong> {visitor.idNumber}</p>
                         <p><strong>Staff:</strong> {visitor.staff ? "Yes" : "No"}</p>
