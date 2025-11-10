@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import axios from "axios";
-import { API_BASE } from "@/constants/api";
 
 export default function QRCodePage() {
     const [inputValue, setInputValue] = useState("");
@@ -15,17 +14,11 @@ export default function QRCodePage() {
     const fetchVisitor = async (code: string) => {
         try {
             const res = await axios.get(
-                `${API_BASE}/Visitors/ValidateQRCode/${encodeURIComponent(code)}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_BEARER_TOKEN}`,
-                        Accept: "application/json",
-                    },
-                }
+                `http://localhost:4000/api/Visitors/ValidateQRCode/${encodeURIComponent(code)}`
             );
             setVisitor(res.data);
         } catch (err: any) {
-            console.error(err);
+            console.error("Frontend fetch error:", err.response?.data || err.message);
             setVisitor({ error: err.response?.data || "Failed to fetch data" });
         }
     };
@@ -93,7 +86,6 @@ export default function QRCodePage() {
             {/* Display Visitor Info */}
             {visitor && !visitor.error && (
                 <div className="border rounded-lg shadow p-6 bg-gray-50 flex flex-col md:flex-row gap-6">
-                    {/* Profile Image */}
                     <div className="flex-shrink-0">
                         <img
                             src={`https://adiems.adcda.gov.ae${visitor.profileImage}`}
@@ -101,8 +93,6 @@ export default function QRCodePage() {
                             className="w-32 h-32 object-cover rounded-full border"
                         />
                     </div>
-
-                    {/* Visitor Details */}
                     <div className="flex-1 space-y-2">
                         <h3 className="text-xl font-bold">
                             {visitor.title}. {visitor.firstName} {visitor.lastName}
@@ -112,13 +102,11 @@ export default function QRCodePage() {
                         <p><strong>Email:</strong> {visitor.email}</p>
                         <p><strong>Phone:</strong> {visitor.phone}</p>
                         <p><strong>Nationality:</strong> {visitor.nationality?.toUpperCase()}</p>
-                        <p><strong>Country of Residence:</strong> {visitor.countryOfResidence?.toUpperCase()}</p>
+                        <p><strong>Country:</strong> {visitor.countryOfResidence?.toUpperCase()}</p>
                         <p><strong>ID Type:</strong> {visitor.idType}</p>
                         <p><strong>ID Number:</strong> {visitor.idNumber}</p>
                         <p><strong>Staff:</strong> {visitor.staff ? "Yes" : "No"}</p>
                     </div>
-
-                    {/* ID Image */}
                     <div className="flex-shrink-0">
                         <img
                             src={`https://adiems.adcda.gov.ae${visitor.idImage}`}
